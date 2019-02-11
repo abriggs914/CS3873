@@ -17,7 +17,7 @@
 * program requires 1 argument given on the cmd line.
 * The address of the remote server. The user will use
 * command line redirection to send a file over the
-* connection
+* connection. (java FILE < file.txt)
 *
 */
 
@@ -34,15 +34,10 @@ class TCPFileClient {
 			System.out.println("ERROR not enough arguments given: " + args.length);
 			return;
 		}
-		//String file = "./" + args[1];
-		//System.out.println(file);
-		//file = "./a.txt";
-		//FileReader fr  = null;
 		BufferedReader inFromUser = null;
 		Socket clientSocket = null;
 		long timeStart = System.currentTimeMillis();
 		try{
-			//fr = new FileReader(file);
 			inFromUser = new BufferedReader(new InputStreamReader(System.in));
 			clientSocket = new Socket(args[0], 6789);
 			DataOutputStream outToServer = new DataOutputStream(
@@ -51,22 +46,27 @@ class TCPFileClient {
 					clientSocket.getInputStream()));
 
 			modifiedSentence = "";
-			//System.out.print("Enter message: ");
 			while((sentence = inFromUser.readLine()) != null){
-				//modifiedSentence += sentence + "\n";
 				outToServer.writeBytes(sentence + '\n');
+				// modified sentence is sent from the server
 				modifiedSentence = inFromServer.readLine();
-				System.out.println("FROM SERVER: " + modifiedSentence);
-				bytesSent += sentence.length();
+				//System.out.println("FROM SERVER: " + modifiedSentence);
+				for(int i = 0; i < sentence.length(); i++){
+					bytesSent += Character.BYTES;
+				}
 			}
+			// calculate elapsed time
 			timeStart = System.currentTimeMillis() - timeStart;
+			// display connection statistics
 			System.out.println("Connection Duration: " + timeStart + "ms");
 			System.out.println("Bytes Sent: " + bytesSent + "B");
 		}
+		// Exception handling
 		catch(Exception e){
 			System.out.println("Failed");
 			e.printStackTrace();
 		}
+		// close buffers
 		finally{
 			inFromUser.close();
 			clientSocket.close();
