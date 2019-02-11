@@ -18,6 +18,7 @@
 * The address of the remote server. The user will use
 * command line redirection to send a file over the
 * connection. (java FILE < file.txt)
+* Use "PoemShakespeare.txt"
 *
 */
 
@@ -58,8 +59,8 @@ class TCPFileClient {
 			// calculate elapsed time
 			timeStart = System.currentTimeMillis() - timeStart;
 			// display connection statistics
-			System.out.println("Connection Duration: " + timeStart + "ms");
-			System.out.println("Bytes Sent: " + bytesSent + "B");
+			System.out.println("Connection Duration: " + timeStart + " ms");
+			System.out.println("Bytes Sent: " + bytesSent + " B");
 		}
 		// Exception handling
 		catch(Exception e){

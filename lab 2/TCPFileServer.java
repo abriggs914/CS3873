@@ -20,7 +20,6 @@ import java.net.*;
 
 class TCPFileServer {
 	public static void main(String args[]) throws Exception {
-		int breakCount = 0;
 		String clientSentence;
 		String capitalizedSentence;
 		ServerSocket welcomeSocket = new ServerSocket(6789);
@@ -30,12 +29,6 @@ class TCPFileServer {
 		System.out.println ("Waiting for connection.....");
 
 		while (true) {
-			System.out.println("breakCount: " + breakCount);
-			if(breakCount > 0){
-				connectionSocket.close();
-				welcomeSocket.close();
-				break;
-			}
 			connectionSocket = welcomeSocket.accept();
 			System.out.println ("Connection successful");
 		  System.out.println ("Waiting for input.....");
@@ -48,11 +41,11 @@ class TCPFileServer {
 						connectionSocket.getOutputStream());
 				// while connection is open read data
 				while(true){
-					// early exit check if nothing was read over the connection
 					clientSentence = "";
+					// early exit check if nothing was read over the connection
 					if((clientSentence = inFromClient.readLine()) == null || clientSentence == ""){
-						breakCount++;
-						break;
+						System.out.println("CONNECTION TERMINATED");
+						return;
 					}
 					// printing to console window of the server
 					System.out.println("From client at " + connectionSocket.getInetAddress()
@@ -67,12 +60,9 @@ class TCPFileServer {
 				e.printStackTrace();
 			}
 			finally{
-				//connectionSocket.close();
 				inFromClient.close();
 				outToClient.close();
-				//welcomeSocket.close();
 			}
 		}
-		//welcomeSocket.close();
 	}
 }
