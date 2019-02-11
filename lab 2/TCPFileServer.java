@@ -1,33 +1,78 @@
 /* TCPServer.java from Kurose-Ross */
 
+/*
+* CS3873 Lab 2
+* Feb.10/19
+*	Avery Briggs
+* 3471065
+*
+*	% I warrant that this is my own work.
+* --- Avery Briggs (3471065) %
+*
+* Simple Socket program to act as a remote server to a client using a
+* TCP connection. Program recieves a message and sends it back to the
+*	client line-by-line in a formatted string.
+*
+*/
+
 import java.io.*;
 import java.net.*;
 
 class TCPFileServer {
 	public static void main(String args[]) throws Exception {
+		int breakCount = 0;
 		String clientSentence;
 		String capitalizedSentence;
 		ServerSocket welcomeSocket = new ServerSocket(6789);
+		Socket connectionSocket = null;
+		BufferedReader inFromClient = null;
+		DataOutputStream outToClient = null;
 		System.out.println ("Waiting for connection.....");
 
 		while (true) {
-			Socket connectionSocket = welcomeSocket.accept();
+			System.out.println("breakCount: " + breakCount);
+			if(breakCount > 0){
+				connectionSocket.close();
+				welcomeSocket.close();
+				break;
+			}
+			connectionSocket = welcomeSocket.accept();
 			System.out.println ("Connection successful");
-		        System.out.println ("Waiting for input.....");
-
-			BufferedReader inFromClient = new BufferedReader(
-					new InputStreamReader(connectionSocket.getInputStream()));
-			DataOutputStream outToClient = new DataOutputStream(
-					connectionSocket.getOutputStream());
-
-			clientSentence = inFromClient.readLine();
-
-			System.out.println("From client at " + connectionSocket.getInetAddress()
-				+ ": " + clientSentence);
-
-			capitalizedSentence = clientSentence.toUpperCase() + '\n';
-			outToClient.writeBytes(capitalizedSentence);
-
+		  System.out.println ("Waiting for input.....");
+			try{
+				// buffer for reading in from client
+				inFromClient = new BufferedReader(
+						new InputStreamReader(connectionSocket.getInputStream()));
+				// buffer for writing to client
+				outToClient = new DataOutputStream(
+						connectionSocket.getOutputStream());
+				// while connection is open read data
+				while(true){
+					// early exit check if nothing was read over the connection
+					clientSentence = "";
+					if((clientSentence = inFromClient.readLine()) == null || clientSentence == ""){
+						breakCount++;
+						break;
+					}
+					// printing to console window of the server
+					System.out.println("From client at " + connectionSocket.getInetAddress()
+						+ ": " + clientSentence);
+					capitalizedSentence = clientSentence.toUpperCase() + '\n';
+					// write the message back to the sender in capitals
+					outToClient.writeBytes(capitalizedSentence);
+				}
+			}
+			catch(Exception e){
+				System.out.println("Fail");
+				e.printStackTrace();
+			}
+			finally{
+				//connectionSocket.close();
+				inFromClient.close();
+				outToClient.close();
+				//welcomeSocket.close();
+			}
 		}
+		//welcomeSocket.close();
 	}
 }
